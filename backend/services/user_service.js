@@ -1,6 +1,6 @@
 // services/user_service.js
 import bcrypt from 'bcrypt';
-import User from '../models/user_model.js'; // Ваш файл моделі
+import User from '../models/user_model.js';
 
 const SALT_ROUNDS = 10;
 
