@@ -26,12 +26,12 @@ const TrackCard = ({
                 <div className="row">
                     <div className="col-md-6">
                         <p className="card-text">
-                            **Жанр:** <span className="badge bg-secondary">{track.genre}</span>
+                            Жанр: <span className="badge bg-secondary">{track.genre}</span>
                         </p>
                     </div>
                     <div className="col-md-6 text-md-end">
                         <p className="card-text">
-                            **Тривалість:** {formatDuration(track.duration)}
+                            Тривалість: {formatDuration(track.duration)}
                         </p>
                     </div>
                 </div>
