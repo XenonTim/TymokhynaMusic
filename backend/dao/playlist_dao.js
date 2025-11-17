@@ -9,6 +9,13 @@ class playlist_dao {
         return Playlist.findById(id).populate("tracks owner", "-passwordHash");
     }
 
+    async getByOwner(ownerId) {
+        return Playlist.find({ owner: ownerId }).populate([
+            { path: "tracks" },
+            { path: "owner", select: "-passwordHash" }
+        ]);
+    }
+
     async create(data) {
         return Playlist.create(data);
     }
@@ -19,6 +26,28 @@ class playlist_dao {
 
     async delete(id) {
         return Playlist.findByIdAndDelete(id);
+    }
+
+    async addTrack(playlistId, trackId) {
+        return Playlist.findByIdAndUpdate(
+            playlistId,
+            { $push: { tracks: trackId } },
+            { new: true }
+        ).populate([
+            { path: "tracks" },
+            { path: "owner", select: "-passwordHash" }
+        ]);
+    }
+
+    async removeTrack(playlistId, trackId) {
+        return Playlist.findByIdAndUpdate(
+            playlistId,
+            { $pull: { tracks: trackId } },
+            { new: true }
+        ).populate([
+            { path: "tracks" },
+            { path: "owner", select: "-passwordHash" }
+        ]);
     }
 }
 
