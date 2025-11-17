@@ -8,9 +8,9 @@ const PlaylistCard = ({
                           onEdit,
                           onRemoveTrack
                       }) => {
-    const isOwner = playlist.owner === currentUserId;
+    const isOwner = playlist.owner && playlist.owner._id === currentUserId;
+    const canModify = role === 'admin' || isOwner;
 
-    // Форматуємо дату
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('uk-UA');
     };
@@ -21,8 +21,6 @@ const PlaylistCard = ({
         const seconds = Math.floor(duration % 60).toString().padStart(2, '0');
         return `${minutes}:${seconds}`;
     };
-
-    const canModify = role === 'admin' || isOwner;
 
     return (
         <div className="card mb-4 shadow">
@@ -60,7 +58,7 @@ const PlaylistCard = ({
                         playlist.tracks.map(track => (
                             <li key={track._id} className="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    **{track.name}** – {track.artists.join(', ')}
+                                    {track.name} – {track.artists.join(', ')}
                                     <span className="badge bg-info ms-2">{formatDuration(track.duration)}</span>
                                 </div>
                                 {canModify && (
