@@ -33,9 +33,11 @@ export const dataApi = {
     updateTrack: (id, data) => api.put(`/tracks/${id}`, data),
     deleteTrack: (id) => api.delete(`/tracks/${id}`),
 
-    getAllPlaylists: () => api.get('/playlists'), // Всі (для адміна)
-    getMyPlaylists: () => api.get('/playlists/my-playlists'), // Тільки власні (для користувача)
+    getAllPlaylists: () => api.get('/playlists'),
+    getMyPlaylists: () => api.get('/playlists/my-playlists'),
     createPlaylist: (data) => api.post('/playlists', data),
     updatePlaylist: (id, data) => api.put(`/playlists/${id}`, data),
+    addTrackToPlaylist: (playlistId, trackId) => api.put(`/playlists/${playlistId}/tracks`, { trackId }),
+    removeTrackFromPlaylist: (playlistId, trackId) => api.delete(`/playlists/${playlistId}/tracks/${trackId}`),
     deletePlaylist: (id) => api.delete(`/playlists/${id}`),
 };
