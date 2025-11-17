@@ -13,7 +13,7 @@ const checkOwnershipOrAdmin = async (req, res, next) => {
         const playlist = await playlist_dao.getById(req.params.id);
         if (!playlist) return res.status(404).json({ message: "Playlist not found" });
 
-        if (req.user.role !== 'admin' && playlist.owner.toString() !== req.user.id) {
+        if (req.user.role !== 'admin' && playlist.owner._id.toString() !== req.user.id) {
             return res.status(403).json({ message: "Доступ заборонено: Ви не є власником цього плейлиста." });
         }
 
@@ -33,6 +33,18 @@ router.get("/", async (req, res) => {
         res.json(playlists);
     } catch (err) {
         res.status(500).json({ message: err.message });
+    }
+});
+
+router.get("/my-playlists", authMiddleware, async (req, res) => {
+    try {
+        const ownerId = req.user.id;
+
+        const playlists = await playlist_dao.getByOwner(ownerId);
+
+        res.json(playlists);
+    } catch (err) {
+        res.status(500).json({ message: `Помилка при отриманні плейлістів користувача: ${err.message}` });
     }
 });
 
@@ -57,12 +69,36 @@ router.get("/:id/total-duration", async (req, res) => {
 
 router.post("/", authMiddleware, async (req, res) => {
     try {
-        // Додаємо ID власника з JWT до даних плейлиста
         const playlistData = { ...req.body, owner: req.user.id };
         const playlist = await playlist_dao.create(playlistData);
         res.status(201).json(playlist);
     } catch (err) {
         res.status(400).json({ message: err.message });
+    }
+});
+router.put("/:id/tracks", authMiddleware, checkOwnershipOrAdmin, async (req, res) => {
+    try {
+        const { trackId } = req.body;
+        if (!trackId) {
+            return res.status(400).json({ message: "Необхідно вказати trackId" });
+        }
+
+        const playlist = await playlist_dao.addTrack(req.params.id, trackId);
+        res.status(200).json(playlist);
+    } catch (err) {
+        res.status(500).json({ message: `Помилка додавання треку до плейлиста: ${err.message}` });
+    }
+});
+
+router.delete("/:id/tracks/:trackId", authMiddleware, checkOwnershipOrAdmin, async (req, res) => {
+    try {
+        const { id, trackId } = req.params;
+
+        const playlist = await playlist_dao.removeTrack(id, trackId);
+
+        res.status(200).json(playlist);
+    } catch (err) {
+        res.status(500).json({ message: `Помилка видалення треку з плейлиста: ${err.message}` });
     }
 });
 
@@ -83,5 +119,4 @@ router.delete("/:id", authMiddleware, checkOwnershipOrAdmin, async (req, res) =>
         res.status(500).json({ message: err.message });
     }
 });
-
 export default router;
